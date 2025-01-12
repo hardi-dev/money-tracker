@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -17,7 +17,6 @@ export default function CategoriesPage() {
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<Category | undefined>()
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [categoryToDelete, setCategoryToDelete] = useState<Category | undefined>()
   
   const {
     categories,
@@ -51,7 +50,7 @@ export default function CategoriesPage() {
       }
       // Refresh categories after successful operation
       await fetchCategories()
-    } catch (error) {
+    } catch {
       toast({
         variant: 'destructive',
         title: 'Error',
@@ -77,7 +76,7 @@ export default function CategoriesPage() {
       })
       // Refresh categories after successful operation
       await fetchCategories()
-    } catch (error) {
+    } catch {
       toast({
         variant: 'destructive',
         title: 'Error',
