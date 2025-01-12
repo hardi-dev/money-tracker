@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils'
 import {
   BarChart3,
   CreditCard,
+  Key,
   LayoutDashboard,
   PieChart,
   Settings,
@@ -16,6 +17,7 @@ interface SidebarLink {
   icon: React.ComponentType<{ className?: string }>
   label: string
   href: string
+  children?: SidebarLink[]
 }
 
 const links: SidebarLink[] = [
@@ -48,6 +50,13 @@ const links: SidebarLink[] = [
     icon: Settings,
     label: 'Settings',
     href: '/dashboard/settings',
+    children: [
+      {
+        icon: Key,
+        label: 'API Keys',
+        href: '/dashboard/settings/api-keys',
+      },
+    ],
   },
 ]
 
@@ -91,19 +100,44 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
           const isActive = pathname === link.href
 
           return (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={cn(
-                'group flex items-center gap-x-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground',
-                isActive
-                  ? 'bg-primary text-primary-foreground'
-                  : 'transparent text-muted-foreground',
+            <div key={link.href}>
+              <Link
+                href={link.href}
+                className={cn(
+                  'group flex items-center gap-x-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground',
+                  isActive
+                    ? 'bg-primary text-primary-foreground'
+                    : 'transparent text-muted-foreground',
+                )}
+              >
+                <Icon className="h-4 w-4" />
+                {link.label}
+              </Link>
+              {link.children && (
+                <div className="ml-6 mt-2">
+                  {link.children.map((childLink) => {
+                    const ChildIcon = childLink.icon
+                    const isChildActive = pathname === childLink.href
+
+                    return (
+                      <Link
+                        key={childLink.href}
+                        href={childLink.href}
+                        className={cn(
+                          'group flex items-center gap-x-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground',
+                          isChildActive
+                            ? 'bg-primary text-primary-foreground'
+                            : 'transparent text-muted-foreground',
+                        )}
+                      >
+                        <ChildIcon className="h-4 w-4" />
+                        {childLink.label}
+                      </Link>
+                    )
+                  })}
+                </div>
               )}
-            >
-              <Icon className="h-4 w-4" />
-              {link.label}
-            </Link>
+            </div>
           )
         })}
       </nav>

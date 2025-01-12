@@ -19,78 +19,69 @@ export async function updateSession(request: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
-      // Configure the cookies to be handled by the request.
       cookies: {
         /**
-         * Gets all the cookies from the request.
-         * 
-         * @returns The cookies from the request.
+         * Gets all cookies from the request
          */
         getAll() {
           return request.cookies.getAll();
         },
         /**
-         * Sets all the cookies in the response.
-         * 
-         * @param cookiesToSet The cookies to set.
+         * Sets multiple cookies in both request and response
          */
-        setAll(cookiesToSet) {
-          // Set the cookies in the request.
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          );
-          // Create a new response object to handle the cookie update.
-          supabaseResponse = NextResponse.next({
-            request,
+        setAll(cookiesList) {
+          // Set cookies in request
+          cookiesList.forEach(({ name, value }) => {
+            request.cookies.set(name, value);
           });
-          // Set the cookies in the response.
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          );
+
+          // Create new response with updated request
+          supabaseResponse = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
+          });
+
+          // Set cookies in response
+          cookiesList.forEach(({ name, value, ...options }) => {
+            supabaseResponse.cookies.set({
+              name,
+              value,
+              ...options,
+            });
+          });
         },
       },
     }
   );
 
-  // Do not run code between createServerClient and
-  // supabase.auth.getUser(). A simple mistake could make it very hard to debug
-  // issues with users being randomly logged out.
-
-  // IMPORTANT: DO NOT REMOVE auth.getUser()
   try {
-    // Get the user from the Supabase auth.
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    // Get the current session
+    const { data: { session } } = await supabase.auth.getSession();
 
-    // Check if the user is not authenticated and the URL is not the login page.
-    if (
-      !user &&
-      !request.nextUrl.pathname.startsWith("/login") && 
-      !request.nextUrl.pathname.startsWith("/register")
-    ) {
-      // no user, potentially respond by redirecting the user to the login page
-      const url = request.nextUrl.clone();
-      url.pathname = "/login";
-      return NextResponse.redirect(url);
+    // Get current pathname
+    const pathname = request.nextUrl.pathname;
+    
+    // Define auth pages
+    const isAuthPage = pathname.startsWith("/login") || pathname.startsWith("/register");
+
+    // Handle auth state
+    if (!session) {
+      // If no session and trying to access protected route
+      if (!isAuthPage && !pathname.startsWith("/api")) {
+        const redirectUrl = new URL("/login", request.url);
+        redirectUrl.searchParams.set("redirectedFrom", pathname);
+        return NextResponse.redirect(redirectUrl);
+      }
+    } else if (isAuthPage) {
+      // If has session and on auth page, redirect to dashboard
+      return NextResponse.redirect(new URL("/dashboard", request.url));
     }
+
+    return supabaseResponse;
   } catch (error) {
     // Handle any errors that occur during the auth process.
-    console.error("Error updating session:", error);
+    console.error("Auth middleware error:", error);
+    return supabaseResponse;
   }
-
-  // IMPORTANT: You *must* return the supabaseResponse object as it is.
-  // If you're creating a new response object with NextResponse.next() make sure to:
-  // 1. Pass the request in it, like so:
-  //    const myNewResponse = NextResponse.next({ request })
-  // 2. Copy over the cookies, like so:
-  //    myNewResponse.cookies.setAll(supabaseResponse.cookies.getAll())
-  // 3. Change the myNewResponse object to fit your needs, but avoid changing
-  //    the cookies!
-  // 4. Finally:
-  //    return myNewResponse
-  // If this is not done, you may be causing the browser and server to go out
-  // of sync and terminate the user's session prematurely!
-
-  return supabaseResponse;
 }

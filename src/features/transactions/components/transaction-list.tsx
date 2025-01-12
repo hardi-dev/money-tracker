@@ -21,8 +21,6 @@ export function TransactionList() {
   const [filters, setFilters] = useState<TransactionFilters>({})
   const { transactions, isLoading } = useTransactions(filters)
 
-  console.log(transactions)
-
   const handleFilterChange = (newFilters: TransactionFilters) => {
     setFilters(newFilters)
   }
