@@ -20,6 +20,7 @@ interface ApiKeyListProps {
 
 export function ApiKeyList({ apiKeys }: ApiKeyListProps) {
   const [selectedApiKey, setSelectedApiKey] = useState<ApiKey | null>(null)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const { toast } = useToast()
 
   const handleCopy = async (key: string) => {
@@ -36,6 +37,11 @@ export function ApiKeyList({ apiKeys }: ApiKeyListProps) {
         variant: "destructive",
       })
     }
+  }
+
+  const handleDelete = (apiKey: ApiKey) => {
+    // Filter out the deleted API key from the list
+    apiKeys = apiKeys.filter(key => key.id !== apiKey.id)
   }
 
   return (
@@ -98,7 +104,10 @@ export function ApiKeyList({ apiKeys }: ApiKeyListProps) {
                           Copy
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          onClick={() => setSelectedApiKey(apiKey)}
+                          onClick={() => {
+                            setSelectedApiKey(apiKey)
+                            setIsDeleteDialogOpen(true)
+                          }}
                           className="text-sm text-destructive"
                         >
                           Revoke
@@ -115,7 +124,12 @@ export function ApiKeyList({ apiKeys }: ApiKeyListProps) {
 
       <DeleteApiKeyDialog
         apiKey={selectedApiKey}
-        onClose={() => setSelectedApiKey(null)}
+        open={isDeleteDialogOpen}
+        onClose={() => {
+          setIsDeleteDialogOpen(false)
+          setSelectedApiKey(null)
+        }}
+        onDelete={handleDelete}
       />
     </>
   )

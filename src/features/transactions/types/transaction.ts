@@ -1,7 +1,5 @@
-import { Category } from '@/types/database.types'
 import { z } from 'zod'
 import {
-  transactionSchema,
   transactionFilterSchema,
   transactionFormSchema,
 } from '../schemas/transaction.schema'

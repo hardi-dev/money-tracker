@@ -115,7 +115,12 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    return NextResponse.json(transactions.map(transactionSchema.parse))
+    // Parse each transaction through the schema
+    const parsedTransactions = transactions?.map(transaction => 
+      transactionSchema.parse(transaction)
+    ) || []
+
+    return NextResponse.json(parsedTransactions)
   } catch (error) {
     console.error("Error getting transactions:", error)
     return NextResponse.json(

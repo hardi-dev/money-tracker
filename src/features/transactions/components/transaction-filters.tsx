@@ -42,9 +42,6 @@ import { Separator } from '@/components/ui/separator'
 import {
   Filter,
   CalendarIcon,
-  X,
-  Check,
-  ChevronDown,
 } from 'lucide-react'
 import { format } from 'date-fns'
 
