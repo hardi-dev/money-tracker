@@ -8,6 +8,7 @@ import { CalendarDateRangePicker } from '@/components/ui/date-range-picker'
 import { type DateRange } from 'react-day-picker'
 import { format } from 'date-fns'
 import { Card, CardContent } from '@/components/ui/card'
+import { PageHeader } from '@/components/page-header'
 import React from 'react'
 
 export default function ReportsPage() {
@@ -26,12 +27,10 @@ export default function ReportsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Reports & Analytics</h1>
-          <p className="text-muted-foreground">
-            Analyze your financial data and track your progress
-          </p>
-        </div>
+        <PageHeader
+          heading="Reports & Analytics"
+          text="Analyze your financial data and track your progress"
+        />
         <ExportOptions reportData={reportData} />
       </div>
 

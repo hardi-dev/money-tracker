@@ -10,6 +10,7 @@ import { CategoryForm } from '@/features/categories/components/category-form'
 import { useCategories } from '@/features/categories/hooks/use-categories'
 import { CategoryType, CategoryFormData } from '@/features/categories/types/category'
 import { Category } from '@/types/database.types'
+import { PageHeader } from '@/components/page-header'
 
 export default function CategoriesPage() {
   const { toast } = useToast()
@@ -96,12 +97,12 @@ export default function CategoriesPage() {
 
   return (
     <div className="space-y-6">
+      <PageHeader
+        heading="Categories"
+        text="Manage your income and expense categories"
+      />
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Categories</h2>
-          <p className="text-muted-foreground">
-            Manage your income and expense categories
-          </p>
         </div>
         <Button onClick={() => setIsFormOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />

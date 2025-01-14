@@ -48,18 +48,20 @@ import { format } from 'date-fns'
 interface TransactionFiltersDialogProps {
   filters?: TransactionFilters
   onFilterChange: (filters: TransactionFilters) => void
+  resetKey?: number
 }
 
 export function TransactionFiltersDialog({
   filters,
   onFilterChange,
+  resetKey = 0,
 }: TransactionFiltersDialogProps) {
   const { categories } = useCategories()
   const [activeFilters, setActiveFilters] = useState<string[]>([])
   const [open, setOpen] = useState(false)
   const form = useForm<TransactionFilters>({
     resolver: zodResolver(transactionFilterSchema),
-    defaultValues: filters,
+    defaultValues: {},
   })
 
   // Update active filters when form values change
@@ -76,10 +78,11 @@ export function TransactionFiltersDialog({
     setActiveFilters(newActiveFilters)
   }, [form]) // Only depend on form instance, not its values
 
-  // Reset form when filters prop changes
+  // Reset form when filters prop changes or resetKey changes
   useEffect(() => {
-    form.reset(filters)
-  }, [filters, form])
+    form.reset({})
+    setActiveFilters([])
+  }, [filters, form, resetKey])
 
   const onSubmit = (data: TransactionFilters) => {
     onFilterChange(data)

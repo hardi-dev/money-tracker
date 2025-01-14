@@ -1,18 +1,19 @@
 import { CreateApiKeyButton } from "@/features/api-keys/components/create-api-key-button"
 import { ApiKeyList } from "@/features/api-keys/components/api-key-list"
 import { getApiKeys } from "@/features/api-keys/actions/api-key"
+import { PageHeader } from '@/components/page-header'
 
 export default async function ApiKeysPage() {
   const { data: apiKeys = [] } = await getApiKeys()
 
   return (
     <div className="container py-6 space-y-6">
+      <PageHeader
+        heading="API Keys"
+        text="Manage API keys for external access to your transactions"
+      />
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">API Keys</h1>
-          <p className="text-muted-foreground">
-            Manage API keys for external access to your transactions
-          </p>
         </div>
         <CreateApiKeyButton />
       </div>

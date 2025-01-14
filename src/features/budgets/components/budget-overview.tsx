@@ -7,11 +7,13 @@ import { formatCurrency } from '@/lib/utils'
 import { useBudgets } from '../hooks/use-budgets'
 
 export function BudgetOverview() {
-  const { budgets } = useBudgets()
+  const { budgets, progress } = useBudgets()
 
   const totalBudget = budgets.reduce((acc, budget) => acc + budget.amount, 0)
-  const totalSpent = budgets.reduce((acc, budget) => acc + (budget.spent || 0), 0)
+  const totalSpent = Object.values(progress).reduce((acc, p) => acc + p.spent, 0)
   const spentPercentage = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0
+
+  const activeBudgets = budgets.filter(budget => !budget.deleted_at)
 
   return (
     <Card>
@@ -40,7 +42,7 @@ export function BudgetOverview() {
 
         <div className="flex items-center justify-between text-sm">
           <span>Active Budgets</span>
-          <span className="font-medium">{budgets.length}</span>
+          <span className="font-medium">{activeBudgets.length}</span>
         </div>
       </CardContent>
     </Card>
