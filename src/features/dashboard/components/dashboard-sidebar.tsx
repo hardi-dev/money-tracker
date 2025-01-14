@@ -29,32 +29,32 @@ const links: SidebarLink[] = [
   {
     icon: CreditCard,
     label: 'Transactions',
-    href: '/dashboard/transactions',
+    href: '/transactions',
   },
   {
     icon: Tag,
     label: 'Categories',
-    href: '/dashboard/categories',
+    href: '/categories',
   },
   {
     icon: PieChart,
     label: 'Budgets',
-    href: '/dashboard/budgets',
+    href: '/budgets',
   },
   {
     icon: BarChart3,
     label: 'Reports',
-    href: '/dashboard/reports',
+    href: '/reports',
   },
   {
     icon: Settings,
     label: 'Settings',
-    href: '/dashboard/settings',
+    href: '/settings',
     children: [
       {
         icon: Key,
         label: 'API Keys',
-        href: '/dashboard/settings/api-keys',
+        href: '/settings/api-keys',
       },
     ],
   },
