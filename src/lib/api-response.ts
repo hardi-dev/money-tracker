@@ -51,14 +51,22 @@ export function errorResponse(
   details?: unknown,
   status: number = 400
 ): NextResponse<ErrorResponse> {
+  const error: ErrorResponse['error'] = {
+    message,
+  }
+  
+  if (code) {
+    error.code = code
+  }
+  
+  if (details) {
+    error.details = details
+  }
+
   return NextResponse.json(
     {
       success: false,
-      error: {
-        message,
-        ...(code && { code }),
-        ...(details && { details }),
-      },
+      error,
     },
     { status }
   )
