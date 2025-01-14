@@ -62,13 +62,14 @@ export async function updateSession(request: NextRequest) {
     // Get current pathname
     const pathname = request.nextUrl.pathname;
     
-    // Define auth pages
+    // Define public and auth pages
     const isAuthPage = pathname.startsWith("/login") || pathname.startsWith("/register");
+    const isPublicPage = pathname === "/" || pathname.startsWith("/api");
 
     // Handle auth state
     if (!session) {
       // If no session and trying to access protected route
-      if (!isAuthPage && !pathname.startsWith("/api")) {
+      if (!isAuthPage && !isPublicPage) {
         const redirectUrl = new URL("/login", request.url);
         redirectUrl.searchParams.set("redirectedFrom", pathname);
         return NextResponse.redirect(redirectUrl);
