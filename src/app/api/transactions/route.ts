@@ -1,7 +1,9 @@
-import { type NextRequest, NextResponse } from "next/server"
+import { type NextRequest } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 import { validateApiKey } from "@/lib/middleware/api-auth"
-import { transactionSchema } from "@/features/transactions/schemas/transaction.schema"
+import { transactionFormSchema } from "@/features/transactions/schemas/transaction.schema"
+import { successResponse, errorResponse } from '@/lib/api-response'
+import { ZodError } from "zod"
 
 export async function POST(request: NextRequest) {
   try {
@@ -24,14 +26,36 @@ export async function POST(request: NextRequest) {
 
     // Check permission
     if (!permissions.includes("transactions.create")) {
-      return NextResponse.json(
-        { error: "Insufficient permissions" },
-        { status: 403 }
+      return errorResponse(
+        "Insufficient permissions",
+        "PERMISSION_ERROR",
+        { required: "transactions.create" },
+        403
       )
     }
 
-    // Get request body
+    // Get and validate request body
     const body = await request.json()
+    
+    try {
+      transactionFormSchema.parse(body)
+    } catch (error) {
+      if (error instanceof ZodError) {
+        const formattedErrors = error.errors.reduce((acc, err) => {
+          const field = err.path.join('.')
+          acc[field] = err.message
+          return acc
+        }, {} as Record<string, string>)
+
+        return errorResponse(
+          "Invalid request data",
+          "VALIDATION_ERROR",
+          formattedErrors,
+          400
+        )
+      }
+      throw error
+    }
 
     // Create Supabase client with request headers
     const supabase = createClient(
@@ -59,18 +83,26 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       console.error("Transaction error:", error)
-      return NextResponse.json(
-        { error: error.message },
-        { status: 400 }
+      return errorResponse(
+        error.message,
+        "DATABASE_ERROR",
+        { code: error.code, details: error.details },
+        400
       )
     }
 
-    return NextResponse.json(transactionSchema.parse(transaction))
+    return successResponse(
+      transaction,
+      "Transaction created successfully",
+      201
+    )
   } catch (error) {
     console.error("Error creating transaction:", error)
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
+    return errorResponse(
+      "Failed to create transaction",
+      "INTERNAL_ERROR",
+      error instanceof Error ? error.message : undefined,
+      500
     )
   }
 }
@@ -109,23 +141,30 @@ export async function GET(request: NextRequest) {
       .order("created_at", { ascending: false })
 
     if (error) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 400 }
+      return errorResponse(
+        error.message,
+        "DATABASE_ERROR",
+        { code: error.code, details: error.details },
+        400
       )
     }
 
     // Parse each transaction through the schema
     const parsedTransactions = transactions?.map(transaction => 
-      transactionSchema.parse(transaction)
+      transactionFormSchema.parse(transaction)
     ) || []
 
-    return NextResponse.json(parsedTransactions)
+    return successResponse(
+      parsedTransactions,
+      "Transactions retrieved successfully"
+    )
   } catch (error) {
     console.error("Error getting transactions:", error)
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
+    return errorResponse(
+      "Failed to fetch transactions",
+      "INTERNAL_ERROR",
+      error instanceof Error ? error.message : undefined,
+      500
     )
   }
 }

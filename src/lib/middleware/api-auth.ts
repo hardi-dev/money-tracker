@@ -17,8 +17,6 @@ export async function validateApiKey(request: NextRequest) {
       )
     }
 
-    console.log("Validating API key:", apiKey)
-
     // Get API key from database
     const { data: keyData, error: keyError } = await supabase
       .from("api_keys")
@@ -26,9 +24,6 @@ export async function validateApiKey(request: NextRequest) {
       .eq("key", apiKey)
       .is("deleted_at", null)
       .single()
-
-    console.log("API key data:", keyData)
-    console.log("API key error:", keyError)
 
     if (keyError || !keyData) {
       return NextResponse.json(
@@ -71,19 +66,13 @@ export async function validateApiKey(request: NextRequest) {
     requestHeaders.set("x-user-id", keyData.user_id)
     requestHeaders.set("x-api-permissions", JSON.stringify(keyData.permissions))
 
-    console.log("Setting headers:", {
-      userId: keyData.user_id,
-      permissions: keyData.permissions
-    })
-
     // Return modified request
     const response = NextResponse.next()
     response.headers.set("x-user-id", keyData.user_id)
     response.headers.set("x-api-permissions", JSON.stringify(keyData.permissions))
 
     return response
-  } catch (error) {
-    console.error("API key validation error:", error)
+  } catch {
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

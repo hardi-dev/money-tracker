@@ -1,0 +1,169 @@
+# Money Tracker API Documentation
+
+## Authentication
+All API requests must be authenticated using an API key. Include your API key in the request headers:
+
+```bash
+x-api-key: your_api_key_here
+```
+
+## API Endpoints
+
+### Transactions
+
+#### Create Transaction
+```http
+POST /api/v1/transactions
+Content-Type: application/json
+x-api-key: your_api_key_here
+
+{
+  "amount": 1000,
+  "type": "EXPENSE",
+  "description": "Grocery shopping",
+  "categoryId": "123e4567-e89b-12d3-a456-426614174000",
+  "date": "2025-01-14"
+}
+```
+
+**Success Response** (201 Created)
+```json
+{
+  "success": true,
+  "data": {
+    "id": "123e4567-e89b-12d3-a456-426614174000",
+    "amount": 1000,
+    "type": "EXPENSE",
+    "description": "Grocery shopping",
+    "categoryId": "123e4567-e89b-12d3-a456-426614174000",
+    "date": "2025-01-14",
+    "createdAt": "2025-01-14T09:06:12.000Z"
+  },
+  "message": "Transaction created successfully"
+}
+```
+
+**Error Response** (400 Bad Request)
+```json
+{
+  "success": false,
+  "error": {
+    "message": "Invalid request data",
+    "code": "VALIDATION_ERROR",
+    "details": {
+      "amount": "Amount must be a positive number",
+      "type": "Type must be either EXPENSE or INCOME"
+    }
+  }
+}
+```
+
+#### List Transactions
+```http
+GET /api/v1/transactions?startDate=2025-01-01&endDate=2025-01-31
+x-api-key: your_api_key_here
+```
+
+**Success Response** (200 OK)
+```json
+{
+  "success": true,
+  "data": {
+    "transactions": [
+      {
+        "id": "123e4567-e89b-12d3-a456-426614174000",
+        "amount": 1000,
+        "type": "EXPENSE",
+        "description": "Grocery shopping",
+        "categoryId": "123e4567-e89b-12d3-a456-426614174000",
+        "date": "2025-01-14",
+        "createdAt": "2025-01-14T09:06:12.000Z"
+      }
+    ],
+    "pagination": {
+      "total": 1,
+      "page": 1,
+      "pageSize": 10
+    }
+  },
+  "message": "Transactions retrieved successfully"
+}
+```
+
+### Categories
+
+#### List Categories
+```http
+GET /api/v1/categories
+x-api-key: your_api_key_here
+```
+
+**Success Response** (200 OK)
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "123e4567-e89b-12d3-a456-426614174000",
+      "name": "Groceries",
+      "type": "EXPENSE",
+      "color": "#FF0000"
+    }
+  ],
+  "message": "Categories retrieved successfully"
+}
+```
+
+### Budgets
+
+#### Create Budget
+```http
+POST /api/v1/budgets
+Content-Type: application/json
+x-api-key: your_api_key_here
+
+{
+  "amount": 5000,
+  "categoryId": "123e4567-e89b-12d3-a456-426614174000",
+  "startDate": "2025-01-01",
+  "endDate": "2025-01-31"
+}
+```
+
+**Success Response** (201 Created)
+```json
+{
+  "success": true,
+  "data": {
+    "id": "123e4567-e89b-12d3-a456-426614174000",
+    "amount": 5000,
+    "categoryId": "123e4567-e89b-12d3-a456-426614174000",
+    "startDate": "2025-01-01",
+    "endDate": "2025-01-31",
+    "createdAt": "2025-01-14T09:06:12.000Z"
+  },
+  "message": "Budget created successfully"
+}
+```
+
+## Error Codes
+
+| Code | Description |
+|------|-------------|
+| `VALIDATION_ERROR` | Request data failed validation |
+| `AUTHENTICATION_ERROR` | Invalid or missing API key |
+| `NOT_FOUND` | Requested resource not found |
+| `INTERNAL_ERROR` | Internal server error |
+| `RATE_LIMIT_ERROR` | Too many requests |
+
+## Rate Limiting
+API requests are limited to:
+- 100 requests per minute for free tier
+- 1000 requests per minute for premium tier
+
+## Best Practices
+1. Always handle error responses in your code
+2. Use appropriate HTTP methods for different operations
+3. Include error handling for network failures
+4. Store API keys securely
+5. Use HTTPS for all API requests

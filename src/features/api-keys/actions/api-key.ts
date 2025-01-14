@@ -84,24 +84,37 @@ export async function getApiKeys() {
  */
 export async function revokeApiKey(id: string) {
   try {
+    console.log('Starting revokeApiKey with id:', id);
+    
     // Get current user
-    const supabase = await createClient()
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession()
-    if (sessionError) throw sessionError
-    if (!session?.user) throw new Error('No user found')
+    const supabase = await createClient();
+    const {
+      data: { session },
+      error: sessionError,
+    } = await supabase.auth.getSession();
+    
+    console.log('Session data:', session);
+    console.log('Session error:', sessionError);
+    
+    if (sessionError) throw sessionError;
+    if (!session?.user) throw new Error("No user found");
 
-    // Soft delete API key
+    console.log('Attempting to delete API key:', id);
+
+    // Hard delete API key
     const { error } = await supabase
       .from('api_keys')
-      .update({ deleted_at: new Date().toISOString() })
-      .match({ id, user_id: session.user.id }) // Ensure user owns the key
+      .delete()
+      .eq('id', id)
+      .eq('user_id', session.user.id);
 
-    if (error) throw error
+    console.log('Delete error:', error);
 
-    revalidatePath('/dashboard/settings/api-keys')
-    return { success: true }
+    if (error) throw error;
+
+    revalidatePath("/dashboard/settings/api-keys");
+    return { success: true };
   } catch (error) {
-    console.error('Error revoking API key:', error)
     return { success: false, error }
   }
 }

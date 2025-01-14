@@ -2,59 +2,54 @@ import { CreateApiKeyButton } from "@/features/api-keys/components/create-api-ke
 import { ApiKeyList } from "@/features/api-keys/components/api-key-list"
 import { getApiKeys } from "@/features/api-keys/actions/api-key"
 import { PageHeader } from '@/components/common/page-header'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { MDXRemote } from 'next-mdx-remote/rsc'
+import fs from 'fs/promises'
+import path from 'path'
 
 export default async function ApiKeysPage() {
   const { data: apiKeys = [] } = await getApiKeys()
+  
+  // Read documentation file
+  const docPath = path.join(process.cwd(), 'src/app/(protected)/settings/api-keys/documentation.mdx')
+  const documentation = await fs.readFile(docPath, 'utf-8')
 
   return (
-    <div className="container py-6 space-y-6">
+    <div className="container mx-auto py-6">
       <PageHeader
         heading="API Keys"
-        text="Manage API keys for external access to your transactions"
+        text="Manage your API keys and explore our API documentation."
       />
-      <div className="flex items-center justify-between">
-        <div>
-        </div>
-        <CreateApiKeyButton />
-      </div>
+      
+      <Tabs defaultValue="keys" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="keys">API Keys</TabsTrigger>
+          <TabsTrigger value="docs">Documentation</TabsTrigger>
+        </TabsList>
 
-      <div className="space-y-4">
-        <div className="rounded-lg border bg-card">
-          <div className="p-6 space-y-4">
-            <h2 className="font-semibold">Documentation</h2>
-            <div className="prose prose-sm max-w-none">
-              <p>
-                Use these API keys to manage your transactions from external applications.
-                Each key can have specific permissions:
-              </p>
-              <ul>
-                <li><code>transactions.create</code> - Create new transactions</li>
-                <li><code>transactions.delete</code> - Delete existing transactions</li>
-              </ul>
-              <h3>Create Transaction</h3>
-              <pre><code>
-                {`POST /api/transactions
-Authorization: Bearer YOUR_API_KEY
-
-{
-  "amount": 100,
-  "type": "EXPENSE",
-  "category_id": "uuid",
-  "description": "Coffee",
-  "date": "2025-01-13"
-}`}
-              </code></pre>
-              <h3>Delete Transaction</h3>
-              <pre><code>
-                {`DELETE /api/transactions/:id
-Authorization: Bearer YOUR_API_KEY`}
-              </code></pre>
-            </div>
+        <TabsContent value="keys" className="space-y-4">
+          <div className="flex justify-end">
+            <CreateApiKeyButton />
           </div>
-        </div>
+          
+          <ApiKeyList apiKeys={apiKeys} />
+        </TabsContent>
 
-        <ApiKeyList apiKeys={apiKeys} />
-      </div>
+        <TabsContent value="docs">
+          <Card>
+            <CardHeader>
+              <CardTitle>API Documentation</CardTitle>
+              <CardDescription>
+                Learn how to integrate Money Tracker with your applications
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="prose dark:prose-invert max-w-none">
+              <MDXRemote source={documentation} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }
