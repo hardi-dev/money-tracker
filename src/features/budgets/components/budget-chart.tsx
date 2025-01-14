@@ -26,13 +26,13 @@ import { useBudgets } from '../hooks/use-budgets'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 export function BudgetChart() {
-  const { budgets } = useBudgets()
+  const { budgets, progress } = useBudgets()
 
   const chartData = budgets.map((budget) => ({
     name: budget.category?.name || '',
     budget: budget.amount,
-    spent: budget.spent || 0,
-    remaining: budget.amount - (budget.spent || 0),
+    spent: progress[budget.id]?.spent || 0,
+    remaining: budget.amount - (progress[budget.id]?.spent || 0),
     color: budget.category?.color || '#94a3b8',
   }))
 
