@@ -10,7 +10,7 @@ import { CategoryForm } from '@/features/categories/components/category-form'
 import { useCategories } from '@/features/categories/hooks/use-categories'
 import { CategoryType, CategoryFormData } from '@/features/categories/types/category'
 import { Category } from '@/types/database.types'
-import { PageHeader } from '@/components/page-header'
+import { PageHeader } from '@/components/common/page-header'
 
 export default function CategoriesPage() {
   const { toast } = useToast()

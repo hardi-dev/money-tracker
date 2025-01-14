@@ -1,7 +1,7 @@
 import { CreateApiKeyButton } from "@/features/api-keys/components/create-api-key-button"
 import { ApiKeyList } from "@/features/api-keys/components/api-key-list"
 import { getApiKeys } from "@/features/api-keys/actions/api-key"
-import { PageHeader } from '@/components/page-header'
+import { PageHeader } from '@/components/common/page-header'
 
 export default async function ApiKeysPage() {
   const { data: apiKeys = [] } = await getApiKeys()

@@ -8,7 +8,7 @@ import { CalendarDateRangePicker } from '@/components/ui/date-range-picker'
 import { type DateRange } from 'react-day-picker'
 import { format } from 'date-fns'
 import { Card, CardContent } from '@/components/ui/card'
-import { PageHeader } from '@/components/page-header'
+import { PageHeader } from '@/components/common/page-header'
 import React from 'react'
 
 export default function ReportsPage() {

@@ -1,6 +1,6 @@
 'use client'
 
-import { PageHeader } from '@/components/page-header'
+import { PageHeader } from '@/components/common/page-header'
 import { BudgetOverview } from '@/features/budgets/components/budget-overview'
 import { BudgetAlerts } from '@/features/budgets/components/budget-alerts'
 import { BudgetList } from '@/features/budgets/components/budget-list'

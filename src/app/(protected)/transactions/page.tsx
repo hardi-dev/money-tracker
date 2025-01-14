@@ -1,6 +1,6 @@
 'use client'
 
-import { PageHeader } from '@/components/page-header'
+import { PageHeader } from '@/components/common/page-header'
 import { TransactionList } from '@/features/transactions/components/transaction-list'
 
 export default function TransactionsPage() {

@@ -13,7 +13,7 @@ import { OverviewChart } from '@/features/dashboard/components/overview-chart'
 import { RecentTransactions } from '@/features/dashboard/components/recent-transactions'
 import { formatCurrency } from '@/lib/utils'
 import { useUser } from '@/features/auth/hooks/use-user'
-import { PageHeader } from '@/components/page-header'
+import { PageHeader } from '@/components/common/page-header'
 
 export default function DashboardPage() {
   const { user } = useUser()
