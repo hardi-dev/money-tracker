@@ -1,4 +1,5 @@
-import { createClient } from '@/lib/supabase/server'
+'use client'
+
 import {
   Card,
   CardContent,
@@ -7,19 +8,31 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useDashboard } from '@/features/dashboard/hooks/use-dashboard'
+import { OverviewChart } from '@/features/dashboard/components/overview-chart'
+import { RecentTransactions } from '@/features/dashboard/components/recent-transactions'
+import { formatCurrency } from '@/lib/utils'
+import { useUser } from '@/features/auth/hooks/use-user'
 
-export default async function DashboardPage() {
-  const supabase = await createClient()
-
+export default function DashboardPage() {
+  const { user } = useUser()
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
+    currentMonthIncome,
+    currentMonthExpenses,
+    totalBalance,
+    incomePercentageChange,
+    expensePercentageChange,
+    activeBudgets,
+    budgetsNearLimit,
+    recentTransactions,
+    transactions,
+  } = useDashboard()
 
   return (
     <div className="flex-1 space-y-4">
       <div className="flex items-center justify-between space-y-2">
         <h2 className="text-3xl font-bold tracking-tight">
-          Welcome back, {session?.user.email}!
+          Welcome back{user?.email ? `, ${user.email}` : ''}!
         </h2>
       </div>
       <Tabs defaultValue="overview" className="space-y-4">
@@ -38,10 +51,9 @@ export default async function DashboardPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">$45,231.89</div>
-                <p className="text-xs text-muted-foreground">
-                  +20.1% from last month
-                </p>
+                <div className="text-2xl font-bold">
+                  {formatCurrency(totalBalance)}
+                </div>
               </CardContent>
             </Card>
             <Card>
@@ -51,9 +63,12 @@ export default async function DashboardPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">$5,231.89</div>
+                <div className="text-2xl font-bold">
+                  {formatCurrency(currentMonthIncome)}
+                </div>
                 <p className="text-xs text-muted-foreground">
-                  +4.1% from last month
+                  {incomePercentageChange >= 0 ? '+' : ''}
+                  {incomePercentageChange.toFixed(1)}% from last month
                 </p>
               </CardContent>
             </Card>
@@ -64,9 +79,12 @@ export default async function DashboardPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">$3,231.89</div>
+                <div className="text-2xl font-bold">
+                  {formatCurrency(currentMonthExpenses)}
+                </div>
                 <p className="text-xs text-muted-foreground">
-                  +2.1% from last month
+                  {expensePercentageChange >= 0 ? '+' : ''}
+                  {expensePercentageChange.toFixed(1)}% from last month
                 </p>
               </CardContent>
             </Card>
@@ -77,9 +95,9 @@ export default async function DashboardPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">4</div>
+                <div className="text-2xl font-bold">{activeBudgets}</div>
                 <p className="text-xs text-muted-foreground">
-                  2 budgets near limit
+                  {budgetsNearLimit} budget{budgetsNearLimit === 1 ? '' : 's'} near limit
                 </p>
               </CardContent>
             </Card>
@@ -90,18 +108,18 @@ export default async function DashboardPage() {
                 <CardTitle>Overview</CardTitle>
               </CardHeader>
               <CardContent className="pl-2">
-                {/* Overview Chart will go here */}
+                <OverviewChart transactions={transactions} />
               </CardContent>
             </Card>
             <Card className="col-span-3">
               <CardHeader>
                 <CardTitle>Recent Transactions</CardTitle>
                 <CardDescription>
-                  You made 12 transactions this month.
+                  You made {transactions.length} transactions this month.
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {/* Recent Transactions list will go here */}
+                <RecentTransactions transactions={recentTransactions} />
               </CardContent>
             </Card>
           </div>
