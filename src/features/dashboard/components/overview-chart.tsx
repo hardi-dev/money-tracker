@@ -10,8 +10,17 @@ import {
 } from 'recharts'
 import { useDashboard } from '@/features/dashboard/hooks/use-dashboard'
 
-export function OverviewChart() {
-  const { dailyExpenses } = useDashboard()
+interface DateRange {
+  from: Date
+  to: Date
+}
+
+interface OverviewChartProps {
+  dateRange: DateRange
+}
+
+export function OverviewChart({ dateRange }: OverviewChartProps) {
+  const { dailyExpenses } = useDashboard({ dateRange })
 
   // Convert daily expenses to chart data format
   const data = Object.entries(dailyExpenses)

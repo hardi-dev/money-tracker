@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import {
   Card,
   CardContent,
@@ -12,12 +13,25 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useDashboard } from '@/features/dashboard/hooks/use-dashboard'
 import { OverviewChart } from '@/features/dashboard/components/overview-chart'
 import { RecentTransactions } from '@/features/dashboard/components/recent-transactions'
+import { PeriodSelector } from '@/features/dashboard/components/period-selector'
 import { formatCurrency } from '@/lib/utils'
 import { useUser } from '@/features/auth/hooks/use-user'
-import { PageHeader } from '@/components/common/page-header'
 import { useCategories } from '@/features/categories/hooks/use-categories'
+import { PageHeader } from '@/components/common/page-header'
+import { startOfMonth, endOfMonth } from 'date-fns'
+
+interface DateRange {
+  from: Date
+  to: Date
+}
 
 export default function DashboardPage() {
+  const now = new Date()
+  const [dateRange, setDateRange] = useState<DateRange>({
+    from: startOfMonth(now),
+    to: endOfMonth(now)
+  })
+
   const { user } = useUser()
   const { categories } = useCategories()
   const {
@@ -29,7 +43,7 @@ export default function DashboardPage() {
     activeBudgets,
     budgetsNearLimit,
     recentTransactions,
-  } = useDashboard()
+  } = useDashboard({ dateRange })
 
   // Convert dailyExpenses object to sorted array
   const dailyExpensesList = Object.entries(dailyExpenses)
@@ -46,10 +60,16 @@ export default function DashboardPage() {
 
   return (
     <div className="flex-1 space-y-4">
-      <PageHeader
-        heading={`Welcome back${user?.email ? `, ${user.email}` : ''}!`}
-        text="Track your financial progress and manage your money effectively."
-      />
+      <div className="flex items-center justify-between">
+        <PageHeader
+          heading={`Welcome back${user?.email ? `, ${user.email}` : ''}!`}
+          text="Track your financial progress and manage your money effectively."
+        />
+        <PeriodSelector 
+          dateRange={dateRange}
+          onDateRangeChange={setDateRange}
+        />
+      </div>
 
       <Tabs defaultValue="overview" className="space-y-4">
         <TabsList>
@@ -86,7 +106,7 @@ export default function DashboardPage() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
-                  This Period Expense
+                  Selected Period Expense
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -114,11 +134,11 @@ export default function DashboardPage() {
               <CardHeader>
                 <CardTitle>Overview</CardTitle>
                 <CardDescription>
-                  Daily expenses for the last 7 days
+                  Daily expenses for the selected period
                 </CardDescription>
               </CardHeader>
               <CardContent className="pl-2">
-                <OverviewChart />
+                <OverviewChart dateRange={dateRange} />
               </CardContent>
             </Card>
             <Card className="col-span-3">
@@ -139,7 +159,7 @@ export default function DashboardPage() {
             <CardHeader>
               <CardTitle>Daily Expenses</CardTitle>
               <CardDescription>
-                Your expenses breakdown by day
+                Your expenses breakdown by day for the selected period
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -161,7 +181,7 @@ export default function DashboardPage() {
             <CardHeader>
               <CardTitle>Expenses by Category</CardTitle>
               <CardDescription>
-                Your expenses breakdown by category for this period
+                Your expenses breakdown by category for the selected period
               </CardDescription>
             </CardHeader>
             <CardContent>

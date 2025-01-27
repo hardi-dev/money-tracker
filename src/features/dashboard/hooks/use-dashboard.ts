@@ -8,17 +8,26 @@ import {
   startOfDay,
   endOfDay,
   parseISO,
-  format
+  format,
+  isWithinInterval,
 } from 'date-fns'
 
-export function useDashboard() {
+interface DateRange {
+  from: Date
+  to: Date
+}
+
+interface UseDashboardOptions {
+  dateRange: DateRange
+}
+
+export function useDashboard(options: UseDashboardOptions) {
   const { transactions } = useTransactions()
   const { budgets } = useBudgets()
 
   // Get current period data
   const now = new Date()
-  const currentMonthStart = startOfMonth(now)
-  const currentMonthEnd = endOfMonth(now)
+  const { from: periodStart, to: periodEnd } = options.dateRange
 
   // Get today's data
   const todayStart = startOfDay(now)
@@ -46,7 +55,7 @@ export function useDashboard() {
   const currentPeriodTransactions = transactions.filter(
     (t) => {
       const date = parseISO(t.date)
-      return date >= currentMonthStart && date <= currentMonthEnd
+      return isWithinInterval(date, { start: periodStart, end: periodEnd })
     }
   )
 
@@ -65,7 +74,10 @@ export function useDashboard() {
 
   // Calculate daily expenses for analytics
   const dailyExpenses = transactions
-    .filter(t => t.type === 'EXPENSE')
+    .filter(t => {
+      const date = parseISO(t.date)
+      return t.type === 'EXPENSE' && isWithinInterval(date, { start: periodStart, end: periodEnd })
+    })
     .reduce((acc, t) => {
       const date = format(parseISO(t.date), 'yyyy-MM-dd')
       if (!acc[date]) acc[date] = 0
@@ -93,7 +105,7 @@ export function useDashboard() {
   })
 
   // Get recent transactions
-  const recentTransactions = [...transactions]
+  const recentTransactions = [...currentPeriodTransactions]
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, 5)
 
