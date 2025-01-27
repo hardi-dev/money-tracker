@@ -1,4 +1,3 @@
-import { type Transaction } from '@/features/transactions/types/transaction'
 import { formatCurrency } from '@/lib/utils'
 import {
   BarChart,
@@ -7,36 +6,21 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
 } from 'recharts'
-import { startOfDay, format, parseISO } from 'date-fns'
+import { useDashboard } from '@/features/dashboard/hooks/use-dashboard'
 
-interface OverviewChartProps {
-  transactions: Transaction[]
-}
+export function OverviewChart() {
+  const { dailyExpenses } = useDashboard()
 
-export function OverviewChart({ transactions }: OverviewChartProps) {
-  // Group transactions by date
-  const transactionsByDate = transactions.reduce((acc, transaction) => {
-    const date = format(startOfDay(parseISO(transaction.date)), 'MMM dd')
-    
-    if (!acc[date]) {
-      acc[date] = { date, income: 0, expense: 0 }
-    }
-    
-    if (transaction.type === 'INCOME') {
-      acc[date].income += transaction.amount
-    } else {
-      acc[date].expense += transaction.amount
-    }
-    
-    return acc
-  }, {} as Record<string, { date: string; income: number; expense: number }>)
-
-  const data = Object.values(transactionsByDate).sort((a, b) =>
-    a.date.localeCompare(b.date)
-  )
+  // Convert daily expenses to chart data format
+  const data = Object.entries(dailyExpenses)
+    .map(([date, amount]) => ({
+      date,
+      expense: amount
+    }))
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .slice(-7) // Show last 7 days
 
   return (
     <ResponsiveContainer width="100%" height={350}>
@@ -45,9 +29,7 @@ export function OverviewChart({ transactions }: OverviewChartProps) {
         <XAxis dataKey="date" />
         <YAxis />
         <Tooltip formatter={(value: number) => formatCurrency(value)} />
-        <Legend />
-        <Bar dataKey="income" name="Income" fill="#22c55e" />
-        <Bar dataKey="expense" name="Expense" fill="#ef4444" />
+        <Bar dataKey="expense" name="Daily Expenses" fill="#ef4444" />
       </BarChart>
     </ResponsiveContainer>
   )

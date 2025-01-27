@@ -1,79 +1,95 @@
 import { useTransactions } from '@/features/transactions/hooks/use-transactions'
 import { useBudgets } from '@/features/budgets/hooks/use-budgets'
-import { startOfMonth, endOfMonth, subMonths, parseISO } from 'date-fns'
+import { 
+  startOfMonth, 
+  endOfMonth, 
+  startOfWeek,
+  endOfWeek,
+  startOfDay,
+  endOfDay,
+  parseISO,
+  format
+} from 'date-fns'
 
 export function useDashboard() {
   const { transactions } = useTransactions()
   const { budgets } = useBudgets()
 
-  // Get current month's data
+  // Get current period data
   const now = new Date()
   const currentMonthStart = startOfMonth(now)
   const currentMonthEnd = endOfMonth(now)
 
-  // Get last month's data
-  const lastMonthStart = startOfMonth(subMonths(now, 1))
-  const lastMonthEnd = endOfMonth(subMonths(now, 1))
+  // Get today's data
+  const todayStart = startOfDay(now)
+  const todayEnd = endOfDay(now)
 
-  // Filter transactions for current month
-  const currentMonthTransactions = transactions.filter(
+  // Get this week's data
+  const weekStart = startOfWeek(now)
+  const weekEnd = endOfWeek(now)
+
+  // Filter transactions for different periods
+  const todayTransactions = transactions.filter(
+    (t) => {
+      const date = parseISO(t.date)
+      return date >= todayStart && date <= todayEnd
+    }
+  )
+
+  const weekTransactions = transactions.filter(
+    (t) => {
+      const date = parseISO(t.date)
+      return date >= weekStart && date <= weekEnd
+    }
+  )
+
+  const currentPeriodTransactions = transactions.filter(
     (t) => {
       const date = parseISO(t.date)
       return date >= currentMonthStart && date <= currentMonthEnd
     }
   )
 
-  // Filter transactions for last month
-  const lastMonthTransactions = transactions.filter(
-    (t) => {
-      const date = parseISO(t.date)
-      return date >= lastMonthStart && date <= lastMonthEnd
-    }
-  )
-
-  // Calculate current month totals
-  const currentMonthIncome = currentMonthTransactions
-    .filter((t) => t.type === 'INCOME')
-    .reduce((sum, t) => sum + t.amount, 0)
-
-  const currentMonthExpenses = currentMonthTransactions
+  // Calculate totals for different periods
+  const todayExpenses = todayTransactions
     .filter((t) => t.type === 'EXPENSE')
     .reduce((sum, t) => sum + t.amount, 0)
 
-  // Calculate last month totals
-  const lastMonthIncome = lastMonthTransactions
-    .filter((t) => t.type === 'INCOME')
-    .reduce((sum, t) => sum + t.amount, 0)
-
-  const lastMonthExpenses = lastMonthTransactions
+  const weekExpenses = weekTransactions
     .filter((t) => t.type === 'EXPENSE')
     .reduce((sum, t) => sum + t.amount, 0)
 
-  // Calculate percentages
-  const incomePercentageChange = lastMonthIncome === 0 
-    ? 100 
-    : ((currentMonthIncome - lastMonthIncome) / lastMonthIncome) * 100
+  const periodExpenses = currentPeriodTransactions
+    .filter((t) => t.type === 'EXPENSE')
+    .reduce((sum, t) => sum + t.amount, 0)
 
-  const expensePercentageChange = lastMonthExpenses === 0
-    ? 100
-    : ((currentMonthExpenses - lastMonthExpenses) / lastMonthExpenses) * 100
+  // Calculate daily expenses for analytics
+  const dailyExpenses = transactions
+    .filter(t => t.type === 'EXPENSE')
+    .reduce((acc, t) => {
+      const date = format(parseISO(t.date), 'yyyy-MM-dd')
+      if (!acc[date]) acc[date] = 0
+      acc[date] += t.amount
+      return acc
+    }, {} as Record<string, number>)
 
-  // Calculate total balance
-  const totalBalance = transactions
-    .reduce((sum, t) => {
-      return t.type === 'INCOME' 
-        ? sum + t.amount 
-        : sum - t.amount
-    }, 0)
+  // Calculate category-wise expenses for reports
+  const categoryExpenses = currentPeriodTransactions
+    .filter(t => t.type === 'EXPENSE')
+    .reduce((acc, t) => {
+      if (!acc[t.category_id]) acc[t.category_id] = 0
+      acc[t.category_id] += t.amount
+      return acc
+    }, {} as Record<string, number>)
 
   // Get active budgets
   const activeBudgets = budgets.filter(b => !b.deleted_at)
   const budgetsNearLimit = activeBudgets.filter(budget => {
-    const budgetTransactions = currentMonthTransactions
+    const budgetTransactions = currentPeriodTransactions
       .filter(t => t.category_id === budget.category_id)
       .reduce((sum, t) => sum + t.amount, 0)
     
-    return (budgetTransactions / budget.amount) >= 0.8 // 80% or more of budget used
+    return (budgetTransactions / budget.amount) >= 0.8
   })
 
   // Get recent transactions
@@ -82,14 +98,14 @@ export function useDashboard() {
     .slice(0, 5)
 
   return {
-    currentMonthIncome,
-    currentMonthExpenses,
-    totalBalance,
-    incomePercentageChange,
-    expensePercentageChange,
+    todayExpenses,
+    weekExpenses,
+    periodExpenses,
+    dailyExpenses,
+    categoryExpenses,
     activeBudgets: activeBudgets.length,
     budgetsNearLimit: budgetsNearLimit.length,
     recentTransactions,
-    transactions: currentMonthTransactions,
+    transactions: currentPeriodTransactions,
   }
 }
