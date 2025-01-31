@@ -31,71 +31,73 @@ export function PeriodSelector({
   onDateRangeChange,
 }: PeriodSelectorProps) {
   return (
-    <div className="flex items-center gap-2">
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            className={cn(
-              "justify-start text-left font-normal",
-              !dateRange.from && "text-muted-foreground"
-            )}
-          >
-            <CalendarIcon className="mr-2 h-4 w-4" />
-            {format(dateRange.from, "LLL dd, y")}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
-          <Calendar
-            initialFocus
-            mode="single"
-            selected={dateRange.from}
-            onSelect={(date) => {
-              if (date) {
-                onDateRangeChange({
-                  from: date,
-                  to: dateRange.to < date ? date : dateRange.to
-                })
-              }
-            }}
-            defaultMonth={dateRange.from}
-          />
-        </PopoverContent>
-      </Popover>
+    <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+      <div className="flex items-center gap-2">
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className={cn(
+                "flex-1 justify-start text-left text-xs sm:text-sm font-normal",
+                !dateRange.from && "text-muted-foreground"
+              )}
+            >
+              <CalendarIcon className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+              {format(dateRange.from, "LLL dd, y")}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              initialFocus
+              mode="single"
+              selected={dateRange.from}
+              onSelect={(date) => {
+                if (date) {
+                  onDateRangeChange({
+                    from: date,
+                    to: dateRange.to < date ? date : dateRange.to
+                  })
+                }
+              }}
+              defaultMonth={dateRange.from}
+            />
+          </PopoverContent>
+        </Popover>
 
-      <span className="text-muted-foreground">to</span>
+        <span className="text-muted-foreground text-xs sm:text-sm">to</span>
 
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            className={cn(
-              "justify-start text-left font-normal",
-              !dateRange.to && "text-muted-foreground"
-            )}
-          >
-            <CalendarIcon className="mr-2 h-4 w-4" />
-            {format(dateRange.to, "LLL dd, y")}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
-          <Calendar
-            initialFocus
-            mode="single"
-            selected={dateRange.to}
-            onSelect={(date) => {
-              if (date) {
-                onDateRangeChange({
-                  from: dateRange.from > date ? date : dateRange.from,
-                  to: date
-                })
-              }
-            }}
-            defaultMonth={dateRange.to}
-            fromDate={dateRange.from}
-          />
-        </PopoverContent>
-      </Popover>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className={cn(
+                "flex-1 justify-start text-left text-xs sm:text-sm font-normal",
+                !dateRange.to && "text-muted-foreground"
+              )}
+            >
+              <CalendarIcon className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+              {format(dateRange.to, "LLL dd, y")}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              initialFocus
+              mode="single"
+              selected={dateRange.to}
+              onSelect={(date) => {
+                if (date) {
+                  onDateRangeChange({
+                    from: dateRange.from > date ? date : dateRange.from,
+                    to: date
+                  })
+                }
+              }}
+              defaultMonth={dateRange.to}
+              fromDate={dateRange.from}
+            />
+          </PopoverContent>
+        </Popover>
+      </div>
 
       <Select
         onValueChange={(value) => {
@@ -123,7 +125,7 @@ export function PeriodSelector({
           }
         }}
       >
-        <SelectTrigger className="w-[130px]">
+        <SelectTrigger className="w-full sm:w-[130px] text-xs sm:text-sm">
           <SelectValue placeholder="Quick select" />
         </SelectTrigger>
         <SelectContent>
