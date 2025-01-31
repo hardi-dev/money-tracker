@@ -58,45 +58,45 @@ function DailyExpenseItem({ date, totalAmount, transactions, categoryTotals, cat
   return (
     <AccordionItem 
       value={date}
-      className="border rounded-xl px-2 shadow-sm transition-all hover:shadow-md data-[state=open]:shadow-md"
+      className="border rounded-xl px-1 md:px-2 shadow-sm transition-all hover:shadow-md data-[state=open]:shadow-md"
     >
-      <AccordionTrigger className="hover:no-underline py-4">
-        <div className="flex flex-1 items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-md bg-primary/10">
-              <div className="text-center flex flex-col justify-center gap-y-1 pt-1">
-                <div className="text-xl/3 font-bold text-primary">
+      <AccordionTrigger className="hover:no-underline py-3 md:py-4">
+        <div className="flex flex-1 items-center justify-between gap-2 md:gap-4">
+          <div className="flex items-center gap-2 md:gap-4">
+            <div className="flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-md bg-primary/10">
+              <div className="text-center flex flex-col justify-center gap-y-0.5 md:gap-y-1 pt-1">
+                <div className="text-lg/3 md:text-xl/3 font-bold text-primary">
                   {format(parseISO(date), 'dd')}
                 </div>
-                <div className="text-xs/3 uppercase text-primary/80">
+                <div className="text-[10px] md:text-xs/3 uppercase text-primary/80">
                   {format(parseISO(date), 'MMM')}
                 </div>
               </div>
             </div>
-            <div className="space-y-1">
-              <div className="text-base font-semibold">
+            <div className="space-y-0.5 md:space-y-1">
+              <div className="text-sm md:text-base font-semibold">
                 {format(parseISO(date), 'EEEE')}
               </div>
-              <div className="text-sm text-muted-foreground">
+              <div className="text-xs md:text-sm text-muted-foreground">
                 {transactions.length} transaction{transactions.length !== 1 ? 's' : ''}
               </div>
             </div>
           </div>
           <div className="text-right">
-            <div className="text-base font-semibold text-red-600">
+            <div className="text-sm md:text-base font-semibold text-red-600">
               {formatCurrency(totalAmount)}
             </div>
-            <div className="text-sm text-muted-foreground">
+            <div className="text-xs md:text-sm text-muted-foreground">
               {Object.keys(categoryTotals).length} categor{Object.keys(categoryTotals).length !== 1 ? 'ies' : 'y'}
             </div>
           </div>
         </div>
       </AccordionTrigger>
-      <AccordionContent className="pb-6">
-        <div className="space-y-6 pt-2">
+      <AccordionContent className="pb-4 md:pb-6">
+        <div className="space-y-4 md:space-y-6 pt-2">
           {/* Category Breakdown */}
-          <div className="rounded-xl border bg-card p-6">
-            <h4 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+          <div className="rounded-xl border bg-card p-3 md:p-6">
+            <h4 className="mb-3 md:mb-4 text-xs md:text-sm font-semibold uppercase tracking-wide text-muted-foreground">
               Category Breakdown
             </h4>
             <div className="space-y-3">
@@ -106,22 +106,22 @@ function DailyExpenseItem({ date, totalAmount, transactions, categoryTotals, cat
                   const category = categories.find(c => c.id === categoryId)
                   const percentage = (amount / totalAmount) * 100
                   return (
-                    <div key={categoryId} className="space-y-2">
+                    <div key={categoryId} className="space-y-1.5 md:space-y-2">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <div
-                            className="h-3 w-3 rounded-full"
+                            className="h-2.5 w-2.5 md:h-3 md:w-3 rounded-full"
                             style={{ backgroundColor: category?.color || '#94a3b8' }}
                           />
-                          <span className="font-medium">
+                          <span className="text-sm md:text-base font-medium">
                             {category?.name || 'Unknown'}
                           </span>
                         </div>
-                        <span className="font-medium">
+                        <span className="text-sm md:text-base font-medium">
                           {formatCurrency(amount)}
                         </span>
                       </div>
-                      <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
+                      <div className="h-1.5 md:h-2 w-full overflow-hidden rounded-full bg-secondary">
                         <div
                           className="h-full rounded-full transition-all"
                           style={{
@@ -137,8 +137,8 @@ function DailyExpenseItem({ date, totalAmount, transactions, categoryTotals, cat
           </div>
           
           {/* Transactions List */}
-          <div className="space-y-3">
-            <h4 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+          <div className="space-y-2 md:space-y-3">
+            <h4 className="text-xs md:text-sm font-semibold uppercase tracking-wide text-muted-foreground">
               Transactions
             </h4>
             <div className="space-y-2">
@@ -147,29 +147,29 @@ function DailyExpenseItem({ date, totalAmount, transactions, categoryTotals, cat
                 .map((transaction) => (
                   <div
                     key={transaction.id}
-                    className="flex items-center justify-between rounded-xl border bg-card p-4 transition-all hover:shadow-sm"
+                    className="flex items-center justify-between rounded-xl border bg-card p-2 md:p-4 transition-all hover:shadow-sm"
                   >
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 md:gap-4">
                       <div
-                        className="flex h-10 w-10 items-center justify-center rounded-xl"
+                        className="flex h-8 w-8 md:h-10 md:w-10 items-center justify-center rounded-lg md:rounded-xl"
                         style={{ backgroundColor: transaction.category?.color || '#94a3b8' }}
                       >
-                        <Wallet className="h-5 w-5 text-white" />
+                        <Wallet className="h-4 w-4 md:h-5 md:w-5 text-white" />
                       </div>
                       <div>
-                        <div className="font-medium">
+                        <div className="text-sm md:text-base font-medium">
                           {transaction.category?.name || 'Unknown'}
                         </div>
-                        <div className="text-sm text-muted-foreground">
+                        <div className="text-xs md:text-sm text-muted-foreground">
                           {transaction.description || 'No description'}
                         </div>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="font-medium text-red-600">
+                      <div className="text-sm md:text-base font-medium text-red-600">
                         {formatCurrency(transaction.amount)}
                       </div>
-                      <div className="text-xs text-muted-foreground">
+                      <div className="text-[10px] md:text-xs text-muted-foreground">
                         {format(parseISO(transaction.date), 'HH:mm')}
                       </div>
                     </div>
@@ -220,11 +220,12 @@ export default function DashboardPage() {
     .sort((a, b) => b.amount - a.amount)
 
   return (
-    <div className="flex-1 space-y-4">
-      <div className="flex items-center justify-between">
+    <div className="flex-1 space-y-4 p-1 md:p-8 pt-6">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <PageHeader
           heading={`Welcome back${user?.email ? `, ${user.email}` : ''}!`}
           text="Track your financial progress and manage your money effectively."
+          className="p-0"
         />
         <PeriodSelector 
           dateRange={dateRange}
@@ -233,7 +234,7 @@ export default function DashboardPage() {
       </div>
 
       <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList>
+        <TabsList className="w-full justify-start overflow-x-auto">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="analytics">Daily Expenses</TabsTrigger>
           <TabsTrigger value="reports">Expenses by Category</TabsTrigger>
@@ -291,7 +292,7 @@ export default function DashboardPage() {
             </Card>
           </div>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-            <Card className="col-span-4">
+            <Card className="col-span-full lg:col-span-4">
               <CardHeader>
                 <CardTitle>Overview</CardTitle>
                 <CardDescription>
@@ -302,7 +303,7 @@ export default function DashboardPage() {
                 <OverviewChart dateRange={dateRange} />
               </CardContent>
             </Card>
-            <Card className="col-span-3">
+            <Card className="col-span-full lg:col-span-3">
               <CardHeader>
                 <CardTitle>Recent Transactions</CardTitle>
                 <CardDescription>
@@ -323,8 +324,8 @@ export default function DashboardPage() {
                 Your expenses breakdown by day for the selected period
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <ScrollArea className="h-[600px] pr-4">
+            <CardContent className="p-2 md:p-6">
+              <ScrollArea className="h-[calc(100vh-15rem)] md:h-[600px] pr-0 md:pr-4">
                 <Accordion type="single" collapsible className="w-full space-y-4">
                   {dailyExpensesList.map(({ date, totalAmount, transactions, categoryTotals }) => (
                     <DailyExpenseItem

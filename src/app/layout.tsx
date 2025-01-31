@@ -29,7 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen overflow-x-hidden`}
       >
         <Providers>
           <ThemeProvider
@@ -38,7 +38,9 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            {children}
+            <div className="relative min-h-screen">
+              {children}
+            </div>
             <Toaster />
           </ThemeProvider>
         </Providers>

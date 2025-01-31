@@ -61,77 +61,85 @@ export function TransactionForm({ transaction, onSuccess }: TransactionFormProps
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="type"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Type</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-                disabled={isLoading}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select type" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="EXPENSE">Expense</SelectItem>
-                  <SelectItem value="INCOME">Income</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="amount"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Amount</FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  placeholder="Enter amount"
-                  {...field}
-                  onChange={(e) => field.onChange(Number(e.target.value))}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="type"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm md:text-base">Type</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
                   disabled={isLoading}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                >
+                  <FormControl>
+                    <SelectTrigger className="h-9 md:h-10 text-sm md:text-base">
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="EXPENSE">Expense</SelectItem>
+                    <SelectItem value="INCOME">Income</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage className="text-xs md:text-sm" />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="amount"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm md:text-base">Amount</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    inputMode="decimal"
+                    placeholder="Enter amount"
+                    className="h-9 md:h-10 text-sm md:text-base"
+                    {...field}
+                    onChange={(e) => field.onChange(Number(e.target.value))}
+                    disabled={isLoading}
+                  />
+                </FormControl>
+                <FormMessage className="text-xs md:text-sm" />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <FormField
           control={form.control}
           name="category_id"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Category</FormLabel>
+              <FormLabel className="text-sm md:text-base">Category</FormLabel>
               <Select
                 onValueChange={field.onChange}
                 defaultValue={field.value}
                 disabled={isLoading || isCategoriesLoading}
               >
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-9 md:h-10 text-sm md:text-base">
                     <SelectValue placeholder={isCategoriesLoading ? "Loading..." : "Select category"} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
                   {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
+                    <SelectItem 
+                      key={category.id} 
+                      value={category.id}
+                      className="text-sm md:text-base"
+                    >
                       {category.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              <FormMessage />
+              <FormMessage className="text-xs md:text-sm" />
             </FormItem>
           )}
         />
@@ -141,40 +149,48 @@ export function TransactionForm({ transaction, onSuccess }: TransactionFormProps
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description</FormLabel>
+              <FormLabel className="text-sm md:text-base">Description</FormLabel>
               <FormControl>
                 <Input 
                   placeholder="Enter description" 
+                  className="h-9 md:h-10 text-sm md:text-base"
                   {...field} 
                   disabled={isLoading}
                 />
               </FormControl>
-              <FormMessage />
+              <FormMessage className="text-xs md:text-sm" />
             </FormItem>
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="date"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Date</FormLabel>
-              <FormControl>
-                <Input 
-                  type="date" 
-                  {...field} 
-                  disabled={isLoading}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="date"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm md:text-base">Date</FormLabel>
+                <FormControl>
+                  <Input 
+                    type="date" 
+                    className="h-9 md:h-10 text-sm md:text-base"
+                    {...field} 
+                    disabled={isLoading}
+                  />
+                </FormControl>
+                <FormMessage className="text-xs md:text-sm" />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <div className="flex justify-end gap-4 pt-4">
-          <Button type="submit" disabled={isLoading}>
-            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          <Button 
+            type="submit" 
+            disabled={isLoading}
+            className="w-full md:w-auto h-9 md:h-10 text-sm md:text-base"
+          >
+            {isLoading && <Loader2 className="mr-2 h-3 w-3 md:h-4 md:w-4 animate-spin" />}
             {transaction ? 'Update' : 'Create'} Transaction
           </Button>
         </div>
