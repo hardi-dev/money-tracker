@@ -70,7 +70,7 @@ export function DashboardBottomNav() {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 h-16 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:hidden">
-      <nav className="container h-full grid grid-cols-4 items-center">
+      <nav className="container h-full grid grid-cols-5 items-center">
         {mainLinks.map((link) => renderLink(link))}
       </nav>
     </div>

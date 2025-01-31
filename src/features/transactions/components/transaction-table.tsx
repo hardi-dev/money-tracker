@@ -34,6 +34,7 @@ import { formatDate } from '@/lib/utils/date'
 import { TransactionDialog } from './transaction-dialog'
 import { TransactionDeleteDialog } from './transaction-delete-dialog'
 import { useTransactions } from '../hooks/use-transactions'
+import { cn } from '@/lib/utils'
 
 interface TransactionTableProps {
   transactions: Transaction[]
@@ -46,82 +47,92 @@ export function TransactionTable({ transactions }: TransactionTableProps) {
 
   const columns: ColumnDef<Transaction>[] = [
     {
-      accessorKey: 'date',
+      accessorKey: "date",
       header: ({ column }) => {
         return (
           <Button
             variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             Date
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
-        )
+        );
       },
-      cell: ({ row }) => formatDate(row.getValue('date')),
+      cell: ({ row }) => formatDate(row.getValue("date")),
     },
     {
-      accessorKey: 'type',
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          >
-            Type
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
-      cell: ({ row }) => (
-        <span className={row.getValue('type') === 'EXPENSE' ? 'text-red-500' : 'text-green-500'}>
-          {row.getValue('type')}
-        </span>
-      ),
-    },
-    {
-      accessorKey: 'category',
-      header: 'Category',
+      accessorKey: "category",
+      header: "Category",
+      size: 150,
       cell: ({ row }) => {
-        const category = row.original.category
-        return category?.name || '-'
+        const category = row.original.category;
+        return category?.name || "-";
       },
     },
     {
-      accessorKey: 'description',
-      header: 'Description',
-    },
-    {
-      accessorKey: 'amount',
+      accessorKey: "amount",
       header: ({ column }) => {
         return (
           <Button
             variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             Amount
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
-        )
+        );
       },
       cell: ({ row }) => {
-        const amount = row.getValue('amount') as number
-        const type = row.getValue('type') as string
+        const amount = row.getValue("amount") as number;
+        const type = row.getValue("type") as string;
 
         return (
           <div className="text-right">
-            <span className={type === 'EXPENSE' ? 'text-red-500' : 'text-green-500'}>
-              {type === 'EXPENSE' ? '-' : '+'}
+            <span
+              className={type === "EXPENSE" ? "text-red-500" : "text-green-500"}
+            >
+              {type === "EXPENSE" ? "-" : "+"}
               {formatCurrency(amount)}
             </span>
           </div>
-        )
+        );
       },
     },
     {
-      id: 'actions',
+      accessorKey: "description",
+      header: "Description",
+      size: 200,
+    },
+    {
+      accessorKey: "type",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Type
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        );
+      },
+      cell: ({ row }) => (
+        <span
+          className={
+            row.getValue("type") === "EXPENSE"
+              ? "text-red-500"
+              : "text-green-500"
+          }
+        >
+          {row.getValue("type")}
+        </span>
+      ),
+    },
+    {
+      id: "actions",
       cell: ({ row }) => {
-        const transaction = row.original
+        const transaction = row.original;
 
         return (
           <div className="flex items-center justify-end gap-2">
@@ -137,10 +148,10 @@ export function TransactionTable({ transactions }: TransactionTableProps) {
               onConfirm={() => removeTransaction(transaction.id)}
             />
           </div>
-        )
+        );
       },
     },
-  ]
+  ];
 
   const table = useReactTable({
     data: transactions,
@@ -152,18 +163,24 @@ export function TransactionTable({ transactions }: TransactionTableProps) {
     state: {
       sorting,
     },
+    defaultColumn: {
+      size: 100,
+    }
   })
 
   return (
     <div className="space-y-4">
       <div className="rounded-md border">
-        <Table>
+        <Table style={{ tableLayout: "fixed" }}>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead
+                      key={header.id}
+                      style={{ width: `${header.getSize()}px` }}
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -171,7 +188,7 @@ export function TransactionTable({ transactions }: TransactionTableProps) {
                             header.getContext()
                           )}
                     </TableHead>
-                  )
+                  );
                 })}
               </TableRow>
             ))}
@@ -184,7 +201,12 @@ export function TransactionTable({ transactions }: TransactionTableProps) {
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell
+                      key={cell.id}
+                      style={{
+                        width: `${cell.column.getSize()}px`,
+                      }}
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
@@ -213,26 +235,78 @@ export function TransactionTable({ transactions }: TransactionTableProps) {
             <PaginationItem>
               <PaginationPrevious
                 onClick={() => table.previousPage()}
+                className={cn(
+                  !table.getCanPreviousPage() &&
+                    "pointer-events-none opacity-50"
+                )}
               />
             </PaginationItem>
-            {Array.from({ length: table.getPageCount() }, (_, i) => (
-              <PaginationItem key={i}>
-                <PaginationLink
-                  onClick={() => table.setPageIndex(i)}
-                  isActive={table.getState().pagination.pageIndex === i}
-                >
-                  {i + 1}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
+            {(() => {
+              const currentPage = table.getState().pagination.pageIndex;
+              const totalPages = table.getPageCount();
+              const delta = 1; // Number of pages to show before and after current page
+
+              const pages = [];
+
+              // Always show first page
+              pages.push(0);
+
+              // Calculate range around current page
+              let rangeStart = Math.max(1, currentPage - delta);
+              let rangeEnd = Math.min(totalPages - 2, currentPage + delta);
+
+              // Adjust range to show more pages when at the edges
+              if (currentPage <= delta) {
+                rangeEnd = Math.min(totalPages - 2, 2 * delta);
+              }
+              if (currentPage >= totalPages - delta - 1) {
+                rangeStart = Math.max(1, totalPages - 2 * delta - 1);
+              }
+
+              // Add ellipsis and range
+              if (rangeStart > 1) {
+                pages.push(-1); // represents ellipsis
+              }
+              for (let i = rangeStart; i <= rangeEnd; i++) {
+                pages.push(i);
+              }
+              if (rangeEnd < totalPages - 2) {
+                pages.push(-1); // represents ellipsis
+              }
+
+              // Always show last page if there is more than one page
+              if (totalPages > 1) {
+                pages.push(totalPages - 1);
+              }
+
+              return pages.map((pageIndex, i) => (
+                <PaginationItem key={i}>
+                  {pageIndex === -1 ? (
+                    <span className="px-4 text-sm text-muted-foreground">
+                      ...
+                    </span>
+                  ) : (
+                    <PaginationLink
+                      onClick={() => table.setPageIndex(pageIndex)}
+                      isActive={currentPage === pageIndex}
+                    >
+                      {pageIndex + 1}
+                    </PaginationLink>
+                  )}
+                </PaginationItem>
+              ));
+            })()}
             <PaginationItem>
               <PaginationNext
                 onClick={() => table.nextPage()}
+                className={cn(
+                  !table.getCanNextPage() && "pointer-events-none opacity-50"
+                )}
               />
             </PaginationItem>
           </PaginationContent>
         </Pagination>
       </div>
     </div>
-  )
+  );
 }
