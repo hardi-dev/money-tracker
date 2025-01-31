@@ -71,17 +71,40 @@ export function useDashboard(options: UseDashboardOptions) {
     .reduce((sum, t) => sum + t.amount, 0)
 
   // Calculate daily expenses for analytics
-  const dailyExpenses = transactions
+  const dailyExpensesData = transactions
     .filter(t => {
       const date = parseISO(t.date)
       return t.type === 'EXPENSE' && isWithinInterval(date, { start: periodStart, end: periodEnd })
     })
     .reduce((acc, t) => {
       const date = format(parseISO(t.date), 'yyyy-MM-dd')
-      if (!acc[date]) acc[date] = 0
-      acc[date] += t.amount
+      if (!acc[date]) {
+        acc[date] = {
+          totalAmount: 0,
+          transactions: [],
+          categoryTotals: {}
+        }
+      }
+      acc[date].totalAmount += t.amount
+      acc[date].transactions.push(t)
+      
+      if (!acc[date].categoryTotals[t.category_id]) {
+        acc[date].categoryTotals[t.category_id] = 0
+      }
+      acc[date].categoryTotals[t.category_id] += t.amount
+      
       return acc
-    }, {} as Record<string, number>)
+    }, {} as Record<string, {
+      totalAmount: number
+      transactions: typeof transactions
+      categoryTotals: Record<string, number>
+    }>)
+
+  // For backwards compatibility
+  const dailyExpenses = Object.entries(dailyExpensesData).reduce((acc, [date, data]) => {
+    acc[date] = data.totalAmount
+    return acc
+  }, {} as Record<string, number>)
 
   // Calculate category-wise expenses for reports
   const categoryExpenses = currentPeriodTransactions
@@ -112,6 +135,7 @@ export function useDashboard(options: UseDashboardOptions) {
     weekExpenses,
     periodExpenses,
     dailyExpenses,
+    dailyExpensesData,
     categoryExpenses,
     activeBudgets: activeBudgets.length,
     budgetsNearLimit: budgetsNearLimit.length,
